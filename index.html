@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Smart Video Hub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #181818;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* The "Browser" Top Bar */
+        #nav-bar {
+            background-color: #202020;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 20px; /* Makes it look like a modern URL bar */
+            border: 1px solid #444;
+            background: #000;
+            color: #27ae60; /* Green text for a "hacker/coder" feel */
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #cc0000;
+        }
+
+        /* The Frame Window */
+        #display-window {
+            flex-grow: 1;
+            width: 100%;
+            border: none;
+            background-image: url('https://www.gstatic.com/youtube/src/web/htdocs/img/unsupported_green_check.png'); /* Placeholder */
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .status-msg {
+            font-size: 11px;
+            color: #888;
+            padding-left: 20px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-bar">
+        <div style="font-size: 20px; margin-right: 10px;">🌐</div>
+        <input type="text" id="urlInput" placeholder="Paste ANY YouTube Link here (e.g. https://www.youtube.com/watch?v=...)">
+        <button onclick="processLink()">Go</button>
+    </div>
+    <div class="status-msg">System: Ready to extract video data...</div>
+
+    <iframe id="display-window" 
+        src="https://www.youtube.com/embed/aqz-KE-bpKQ" 
+        allowfullscreen>
+    </iframe>
+
+    <script>
+        function processLink() {
+            const rawUrl = document.getElementById('urlInput').value;
+            const frame = document.getElementById('display-window');
+            
+            // This is the "Magic" part: It searches the link for the ID
+            let videoId = "";
+
+            if (rawUrl.includes("v=")) {
+                // Extracts ID from standard links: youtube.com/watch?v=ID
+                videoId = rawUrl.split("v=")[1].split("&")[0];
+            } else if (rawUrl.includes("be/")) {
+                // Extracts ID from short links: youtu.be/ID
+                videoId = rawUrl.split("be/")[1].split("?")[0];
+            } else {
+                // If they just type the ID anyway
+                videoId = rawUrl;
+            }
+
+            if (videoId) {
+                frame.src = "https://www.youtube.com/embed/" + videoId;
+                document.querySelector('.status-msg').innerText = "System: Loading Video ID [" + videoId + "]";
+            } else {
+                alert("Please paste a valid YouTube link!");
+            }
+        }
+
+        // Allow pressing "Enter" key to load
+        document.getElementById("urlInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                processLink();
+            }
+        });
+    </script>
+
+</body>
+</html>
