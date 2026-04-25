@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Smart Video Hub (iPad Optimized)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #181818;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* The "Browser" Top Bar */
+        #nav-bar {
+            background-color: #202020;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            background: #000;
+            color: #27ae60; 
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #cc0000;
+        }
+
+        /* The Frame Window */
+        #display-window {
+            flex-grow: 1;
+            width: 100%;
+            border: none;
+            background-color: #000;
+        }
+
+        .status-msg {
+            font-size: 11px;
+            color: #888;
+            padding-left: 20px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-bar">
+        <div style="font-size: 20px; margin-right: 10px;">🌐</div>
+        <input type="text" id="urlInput" placeholder="Paste ANY YouTube Link here...">
+        <button onclick="processLink()">Go</button>
+    </div>
+    <div class="status-msg">System: Ready to extract video data...</div>
+
+    <iframe id="display-window" 
+        src="https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+    </iframe>
+
+    <script>
+        function processLink() {
+            const rawUrl = document.getElementById('urlInput').value;
+            const frame = document.getElementById('display-window');
+            
+            let videoId = "";
+
+            // Regular Expression to catch various YouTube URL formats
+            if (rawUrl.includes("v=")) {
+                videoId = rawUrl.split("v=")[1].split("&")[0];
+            } else if (rawUrl.includes("be/")) {
+                videoId = rawUrl.split("be/")[1].split("?")[0];
+            } else if (rawUrl.includes("embed/")) {
+                videoId = rawUrl.split("embed/")[1].split("?")[0];
+            } else {
+                videoId = rawUrl;
+            }
+
+            if (videoId.length >= 11) {
+                // CHANGED: Using the nocookie domain to bypass restrictions
+                frame.src = "https://www.youtube-nocookie.com/embed/" + videoId;
+                document.querySelector('.status-msg').innerText = "System: Loading Privacy-Enhanced ID [" + videoId + "]";
+            } else {
+                alert("Please paste a valid YouTube link or ID!");
+            }
+        }
+
+        // Allow pressing "Enter" key to load
+        document.getElementById("urlInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                processLink();
+            }
+        });
+    </script>
+
+</body>
+</html>
