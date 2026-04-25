@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iPad Cloud Browser</title>
+    <style>
+        body { 
+            background: #121212; 
+            color: white; 
+            font-family: -apple-system, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; margin: 0; 
+        }
+        .search-box { width: 90%; max-width: 400px; text-align: center; }
+        input { 
+            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; 
+            background: #1e1e1e; color: white; font-size: 18px; outline: none; box-sizing: border-box;
+        }
+        button { 
+            margin-top: 15px; width: 100%; padding: 12px; border-radius: 12px; border: none; 
+            background: #007aff; color: white; font-size: 18px; font-weight: bold; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-box">
+        <h1>Cloud Browser</h1>
+        <input type="text" id="url" placeholder="Enter URL (e.g. youtube.com)">
+        <button onclick="go()">Browse</button>
+    </div>
+
+    <script>
+        function go() {
+            let url = document.getElementById('url').value;
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+            // This redirects you through the proxy engine in server.js
+            window.location.href = '/proxy/' + url;
+        }
+    </script>
+</body>
+</html>
