@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khorshed's iPad Portal</title>
+
+    <style>
+        :root { 
+            --bg: #0a0a0a; 
+            --panel: #1a1a1a; 
+            --accent: #FF0000; 
+            --secondary: #333333;
+            --text: #ffffff; 
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body, html {
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 🔒 LOCK SCREEN */
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .lock-box {
+            background: var(--panel);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .lock-box h2 { margin: 0 0 20px 0; font-weight: 300; letter-spacing: 1px; }
+
+        .lock-box input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px; /* Prevents auto-zoom on iOS */
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .lock-box button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #errorMsg { color: #ff4444; font-size: 14px; margin-top: 10px; min-height: 20px; }
+
+        /* 📱 MAIN UI */
+        .header {
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel);
+            border-bottom: 1px solid #333;
+            padding: 10px;
+            gap: 12px;
+        }
+
+        .status-bar { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+        .search-container {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        input.main-input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-gray { background: var(--secondary); }
+
+        .nav-row { display: flex; gap: 10px; }
+
+        /* 🪟 WINDOW */
+        .window-container {
+            height: calc(100% - 160px);
+            width: 100%;
+            background: #000;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff; /* Some sites expect white bg */
+        }
+    </style>
+</head>
+<body>
+
+<div id="lockScreen">
+    <div class="lock-box">
+        <h2>PORTAL</h2>
+        <input type="password" id="passwordInput" placeholder="Enter Passcode" autocomplete="off">
+        <button onclick="checkPassword()">Unlock Access</button>
+        <p id="errorMsg"></p>
+    </div>
+</div>
+
+<div class="header">
+    <div class="status-bar">System Active • Secure iPad Mode</div>
+
+    <div class="search-container">
+        <input type="text" id="query" class="main-input" placeholder="Search YouTube via Swisscows...">
+        <button class="btn" onclick="searchYouTube()">Search</button>
+    </div>
+
+    <div class="nav-row">
+        <button class="btn btn-gray" onclick="loadSite('https://www.dogpile.com')">Home</button>
+        <button class="btn btn-gray" onclick="loadSite('https://www.wikipedia.org')">Wiki</button>
+        <button class="btn btn-gray" onclick="refreshFrame()">Refresh</button>
+    </div>
+</div>
+
+<div class="window-container">
+    <iframe
+        id="mainFrame"
+        src="https://www.dogpile.com"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+        allowfullscreen>
+    </iframe>
+</div>
+
+<script>
+    const frame = document.getElementById('mainFrame');
+    const queryInput = document.getElementById('query');
+    const passInput = document.getElementById('passwordInput');
+
+    // 🔒 PASSWORD SYSTEM
+    function checkPassword() {
+        const input = passInput.value;
+        const correctPassword = "unblocked"; 
+
+        if (input === correctPassword) {
+            document.getElementById("lockScreen").style.transition = "opacity 0.5s";
+            document.getElementById("lockScreen").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("lockScreen").style.display = "none";
+            }, 500);
+        } else {
+            document.getElementById("errorMsg").textContent = "Access Denied";
+            passInput.value = "";
+            passInput.focus();
+        }
+    }
+
+    // Enter key listener for password
+    passInput.addEventListener("keypress", (e) => { if (e.key === "Enter") checkPassword(); });
+
+    // 🌐 SITE FUNCTIONS
+    function loadSite(url) {
+        frame.src = url;
+    }
+
+    function refreshFrame() {
+        const currentSrc = frame.src;
+        frame.src = ''; 
+        frame.src = currentSrc;
+    }
+
+    function searchYouTube() {
+        const query = queryInput.value.trim();
+        if (query) {
+            // Using Swisscows to bypass direct YouTube frame blocking
+            const searchUrl = `https://swisscows.com/en/video?query=${encodeURIComponent(query)}+site%3Ayoutube.com`;
+            loadSite(searchUrl);
+        }
+    }
+
+    // Enter key listener for search
+    queryInput.addEventListener("keypress", (e) => { if (e.key === "Enter") searchYouTube(); });
+</script>
+
+</body>
+</html>
